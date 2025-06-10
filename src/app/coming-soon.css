@@ -1,0 +1,218 @@
+body {
+
+    background-color: #030114;
+}
+
+.coming-soon {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 70px;
+    align-items: flex-end;
+    background: url('../../public/bg.png') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.coming-soon .container {
+    max-width: 556px;
+}
+
+.coming-soon .line {
+    background: linear-gradient(270deg, rgba(255, 255, 255, 0.1) -0.06%, rgba(255, 255, 255, 0.2) 19.96%, rgba(255, 255, 255, 0.2) 79.99%, rgba(255, 255, 255, 0.1) 100%);
+    width: 100%;
+    height: 1px;
+    display: block;
+}
+
+
+.coming-soon .top-sec {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.coming-soon .logo {
+    height: 50px;
+    margin: 0 auto 20px auto;
+}
+
+.coming-soon .top-sec h1 {
+    font-weight: 600;
+    font-size: 60px;
+    margin: 0 auto 30px auto;
+    display: block;
+}
+
+.coming-soon .top-sec p {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #E9E9E9CC;
+    margin-bottom: 30px;
+}
+
+
+.coming-soon .top-sec .newsletter {
+    margin-bottom: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.coming-soon .top-sec .newsletter input {
+    width: 375px;
+    border: 1px solid #9e71dea4;
+    border-radius: 100px;
+    padding: 20px 30px;
+}
+
+.coming-soon .top-sec button {
+    background: radial-gradient(50% 50% at 50% 50%, rgba(191, 153, 233, 0.85) 0%, rgba(141, 93, 208, 0.85) 100%);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    vertical-align: middle;
+    text-transform: capitalize;
+    color: #fff;
+    padding: 18px 40px;
+    border-radius: 100px;
+    border: 3px solid #9E71DE;
+    cursor: pointer;
+}
+
+.coming-soon .top-sec button:hover {
+    box-shadow: 0px 2px 5px 0px #9E6DDF;
+
+
+
+}
+
+.coming-soon .social-icons {
+    margin: 43px auto 0 auto;
+    width: max-content;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+.coming-soon .social-icons .icons {
+    cursor: pointer;
+    border: 1px solid #9e71de79;
+    width: 35px;
+    height: 35px;
+    display: block;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+
+.coming-soon .social-icons .icons .text {
+    display: none;
+}
+
+
+.coming-soon .social-icons .icons {
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    transition: width 0.3s ease;
+}
+
+.icon-link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    padding-left: 10px;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.icon-img {
+    width: 13px;
+    height: 13px;
+}
+
+.icon-text {
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* Hover effect */
+.coming-soon .social-icons .icons:hover {
+    width: 118px;
+}
+
+.coming-soon .social-icons .icons:hover .icon-text {
+    opacity: 1;
+}
+
+
+.icon-link .linkedin {
+    margin-top: -3px;
+}
+
+@media screen and (max-width: 620px) {
+    .coming-soon .container {
+        max-width: 100%;
+        padding: 0 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .coming-soon .bottom-sec{
+        width: 100%;
+    }
+
+    .coming-soon .top-sec .newsletter {
+        gap: 10px;
+        margin: 0px
+    }
+    
+    
+    .coming-soon .top-sec h1,
+    .coming-soon .top-sec p{
+        text-align:center;
+    }
+    .coming-soon .top-sec p{
+        line-height: 1.2;
+        font-size: 16px;
+    }
+    
+    .coming-soon .top-sec h1{
+        font-size: 40px;
+    }
+
+    .coming-soon .top-sec .newsletter input {
+        width: 100%;
+        border: 1px solid #9e71dea4;
+        border-radius: 100px;
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+
+
+    .coming-soon .top-sec button {
+        width: auto;
+        white-space: nowrap;
+        padding: 15px 20px;
+        font-size: 18px;
+    }
+    
+    .coming-soon{
+        padding-bottom: 20px;
+    }
+
+}
