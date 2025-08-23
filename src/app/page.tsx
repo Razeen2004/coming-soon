@@ -1,104 +1,171 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import './coming-soon.css';
-import Image from 'next/image';
-
-import facebookIcon from '../../public/facebook.png';
-import instagramIcon from '../../public/instagram.png';
-import twitterIcon from '../../public/x.png';
-import linkedinIcon from '../../public/linkedin.png';
-import logo from '../../public/logo.png';
+import { v4 as uuidv4 } from 'uuid';
+import ChatSidebar from './components/chatSidebar';
+import ChatInput from './components/chatInput';
+import ChatMessage from './components/chatMessage';
+import { Chat, Message } from './types/index';
 
 export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [email, setEmail] = useState('');
-  const [toast, setToast] = useState<string | null>(null);
-
-  const isValidEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const handleNotify = () => {
-    if (loading || submitted) return;
-
-    if (!isValidEmail(email)) {
-      setToast('Please enter a valid email address.');
-      return;
-    }
-
-    setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      setToast('✓ You’re on the list!');
-    }, 1500);
-  };
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 3000); // Hide toast after 3s
-      return () => clearTimeout(timer);
+    const savedChats = localStorage.getItem('chats');
+    if (savedChats) {
+      setChats(JSON.parse(savedChats));
     }
-  }, [toast]);
+  }, []);
+
+  useEffect(() => {
+    if (chats.length > 0) {
+      localStorage.setItem('chats', JSON.stringify(chats));
+    }
+  }, [chats]);
+
+  const currentChat = chats.find((chat) => chat.id === currentChatId);
+
+  const handleNewChat = () => {
+    const newChat: Chat = {
+      id: uuidv4(),
+      title: 'New Chat',
+      messages: [],
+    };
+    setChats([newChat, ...chats]);
+    setCurrentChatId(newChat.id);
+  };
+
+  const handleSendMessage = async (content: string) => {
+    if (!currentChatId) return;
+
+    const userMessage: Message = { id: uuidv4(), content, role: 'user' };
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === currentChatId
+          ? { ...chat, messages: [...chat.messages, userMessage] }
+          : chat
+      )
+    );
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...(currentChat?.messages || []), userMessage] }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Request Timed out or failed`);
+      }
+
+      const assistantMessageId = uuidv4();
+      let assistantContent = '';
+
+      // Create assistant message placeholder
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat.id === currentChatId
+            ? {
+              ...chat,
+              messages: [...chat.messages, { id: assistantMessageId, content: '', role: 'assistant' }],
+            }
+            : chat
+        )
+      );
+
+      // Process streaming response
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('No response body');
+
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter((line) => line.trim());
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
+                setChats((prev) =>
+                  prev.map((chat) =>
+                    chat.id === currentChatId
+                      ? {
+                        ...chat,
+                        messages: chat.messages.map((msg) =>
+                          msg.id === assistantMessageId
+                            ? { ...msg, content: assistantContent }
+                            : msg
+                        ),
+                      }
+                      : chat
+                  )
+                );
+              }
+            } catch (jsonError) {
+              console.warn('Invalid JSON chunk:', data); // Log invalid chunks but don't throw
+            }
+          }
+        }
+      }
+
+      // Update chat title if first message
+      if ((currentChat?.messages.length || 0) === 0) {
+        setChats((prev) =>
+          prev.map((chat) =>
+            chat.id === currentChatId ? { ...chat, title: content.slice(0, 30) + '...' } : chat
+          )
+        );
+      }
+    } catch (error: any) {
+      console.error('Error fetching response:', error);
+      const errorMessage: Message = {
+        id: uuidv4(),
+        content: `Error: ${error.message}`,
+        role: 'assistant',
+      };
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat.id === currentChatId
+            ? { ...chat, messages: [...chat.messages, errorMessage] }
+            : chat
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className='coming-soon'>
-      <div className="container">
-        <div className="top-di"></div>
-        <div className="top-sec">
-          <Image src={logo} alt='Prompt Suite Logo' className='logo' />
-          <h1>Coming Soon</h1>
-          <p>Get ready everyone! We are currently working on something awesome.</p>
-
-          <div className="newsletter">
-            <input
-              type="email"
-              placeholder='Enter your email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={submitted}
-            />
-            <button onClick={handleNotify} disabled={submitted || loading}>
-              {loading ? 'Sending...' : submitted ? '✓ Sent!' : 'Notify Me'}
-            </button>
-          </div>
+    <div className="flex h-screen bg-[#1B1B1D]">
+      <ChatSidebar
+        chats={chats}
+        currentChatId={currentChatId}
+        onNewChat={handleNewChat}
+        onSelectChat={setCurrentChatId}
+      />
+      <div className="flex-1 flex flex-col">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {currentChat ? (
+            currentChat.messages.map((msg: any) => <ChatMessage key={msg.id} message={msg} />)
+          ) : (
+            <div className="text-center mt-20">Select or start a new chat</div>
+          )}
         </div>
-
-        <div className="bottom-sec">
-          <span className='line'></span>
-          <div className="social-icons">
-            <div className="icons">
-              <a href="https://www.facebook.com/profile.php?id=61576910941472" className='icon-link'>
-                <Image src={facebookIcon} alt='' className='icon-img' />
-                <span className='icon-text'> Facebook</span>
-              </a>
-            </div>
-            <div className="icons">
-              <a href="https://www.instagram.com/promptsuite.dev/" className='icon-link'>
-                <Image src={instagramIcon} alt='' className='icon-img' />
-                <span className='icon-text'> Instagram</span>
-              </a>
-            </div>
-            <div className="icons">
-              <a href="https://x.com/promptsuite" className='icon-link'>
-                <Image src={twitterIcon} alt='' className='icon-img' />
-                <span className='icon-text'> TwitterX</span>
-              </a>
-            </div>
-            <div className="icons">
-              <a href="https://www.linkedin.com/in/promptsuite-technologies-36596a36a/" className='icon-link'>
-                <Image src={linkedinIcon} alt='' className='icon-img linkedin' />
-                <span className='icon-text'> LinkedIn</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        <ChatInput onSend={handleSendMessage} disabled={!currentChatId || isLoading} />
       </div>
-
-      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }
