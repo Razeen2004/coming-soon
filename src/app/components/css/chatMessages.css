@@ -1,0 +1,218 @@
+/* Base container */
+.assistant-message {
+  line-height: 1.6;
+  color: #f2f2f2e2;
+  font-size: 16px;
+  font-family: "Urbanist", sans-serif;
+  word-wrap: break-word;
+}
+
+/* Headings */
+.assistant-message h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+  border-bottom: 2px solid #333;
+  padding-bottom: 0.3rem;
+}
+
+.assistant-message h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.9rem 0 0.4rem;
+  border-left: 4px solid #444;
+  padding-left: 0.5rem;
+}
+
+.assistant-message h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.7rem 0 0.3rem;
+}
+
+.assistant-message h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.6rem 0 0.3rem;
+}
+
+.assistant-message h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.2rem;
+}
+
+.assistant-message h6 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Paragraphs */
+.assistant-message p {
+  margin: 0.6rem 0;
+  color: #F2F2F2;
+  opacity: 0.85;
+}
+
+/* Links */
+.assistant-message a {
+  color: #B18BE3;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.assistant-message a:hover {
+  color: #a56eee;
+  text-decoration: underline;
+}
+
+/* Lists */
+.assistant-message ul,
+.assistant-message ol {
+  margin: 0.6rem 0 0.6rem 1.5rem;
+  padding: 0;
+}
+
+.assistant-message li {
+  margin: 0.3rem 0;
+}
+
+/* Blockquote */
+.assistant-message blockquote {
+  border-left: 4px solid #555;
+  margin: 0.8rem 0;
+  padding-left: 1rem;
+  color: #ccc;
+  font-style: italic;
+}
+
+/* Inline code */
+.assistant-message pre {
+  background-color: #262628;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  font-size: 0.9em;
+  font-family: "Fira Code", monospace;
+
+  /* Fix overflow */
+  white-space: pre-wrap;   /* wrap long lines */
+  word-wrap: break-word;   /* break words if needed */
+  overflow-x: auto;        /* allow horizontal scroll if absolutely needed */
+  max-width: 100%;         /* never exceed parent width */
+  box-sizing: border-box;
+}
+
+.assistant-message code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Horizontal rule */
+.assistant-message hr {
+  border: none;
+  border-top: 1px solid #262628;
+  margin: 1rem 0;
+}
+
+/* Tables */
+.assistant-message table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.95em;
+}
+
+.assistant-message th,
+.assistant-message td {
+  border: 1px solid #444;
+  padding: 0.5rem 0.8rem;
+  text-align: left;
+}
+
+.assistant-message th {
+  background-color: #2b2b2b;
+  font-weight: 600;
+}
+
+
+
+/* For WebKit browsers (Chrome, Edge, Safari) */
+.assistant-message pre::-webkit-scrollbar {
+  height: 8px;              /* horizontal scrollbar height */
+  width: 8px;               /* vertical scrollbar width */
+}
+
+.assistant-message pre::-webkit-scrollbar-track {
+  background: #1e1e2f;       /* scrollbar track */
+  border-radius: 10px;
+}
+
+.assistant-message pre::-webkit-scrollbar-thumb {
+  background: #444;          /* draggable part */
+  border-radius: 10px;
+  border: 2px solid #1e1e2f; /* gap around thumb */
+}
+
+.assistant-message pre::-webkit-scrollbar-thumb:hover {
+  background: #666;          /* hover effect */
+}
+
+/* For Firefox */
+.assistant-message pre {
+  scrollbar-width: thin;          /* "auto" or "thin" */
+  scrollbar-color: #444 #1e1e2f;  /* thumb color, track color */
+}
+
+
+.content-area div::-webkit-scrollbar {
+  height: 130px;              /* horizontal scrollbar height */
+  width: 10px;               /* vertical scrollbar width */
+}
+
+.content-area div::-webkit-scrollbar-track {
+  background: transparent;  
+}
+
+.content-area div::-webkit-scrollbar-thumb {
+  background: #26262C;
+}
+
+.content-area div::-webkit-scrollbar-thumb:hover {
+  background: #666;          /* hover effect */
+}
+
+/* Typing dots animation (inside the assistant bubble) */
+.typing-indicator {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typingBounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+.chat-title{
+      white-space: nowrap;
+    width: 54%;
+    overflow: hidden;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import ChatSidebar from './components/chatSidebar';
 import ChatInput from './components/chatInput';
@@ -11,7 +11,19 @@ export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const currentChat = chats.find((chat) => chat.id === currentChatId);
 
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll when messages change
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [currentChat?.messages]);
+
+  // Load chats from localStorage
   useEffect(() => {
     const savedChats = localStorage.getItem('chats');
     if (savedChats) {
@@ -19,13 +31,24 @@ export default function Home() {
     }
   }, []);
 
+  // Save chats to localStorage
   useEffect(() => {
     if (chats.length > 0) {
       localStorage.setItem('chats', JSON.stringify(chats));
     }
   }, [chats]);
 
-  const currentChat = chats.find((chat) => chat.id === currentChatId);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [currentChat?.messages]);
+
+  const handleDeleteChat = (id: string) => {
+    setChats((prev) => prev.filter((chat) => chat.id !== id));
+
+    if (currentChatId === id) {
+      setCurrentChatId(null); // clear if current chat is deleted
+    }
+  };
 
   const handleNewChat = () => {
     const newChat: Chat = {
@@ -38,12 +61,24 @@ export default function Home() {
   };
 
   const handleSendMessage = async (content: string) => {
-    if (!currentChatId) return;
+    let chatId = currentChatId;
+
+    // ✅ Auto-create chat if none exists
+    if (!chatId) {
+      const newChat: Chat = {
+        id: uuidv4(),
+        title: 'New Chat',
+        messages: [],
+      };
+      setChats((prev) => [newChat, ...prev]);
+      setCurrentChatId(newChat.id);
+      chatId = newChat.id;
+    }
 
     const userMessage: Message = { id: uuidv4(), content, role: 'user' };
     setChats((prev) =>
       prev.map((chat) =>
-        chat.id === currentChatId
+        chat.id === chatId
           ? { ...chat, messages: [...chat.messages, userMessage] }
           : chat
       )
@@ -54,78 +89,45 @@ export default function Home() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...(currentChat?.messages || []), userMessage] }),
+        body: JSON.stringify({
+          messages: [
+            ...(chats.find((c) => c.id === chatId)?.messages || []),
+            userMessage,
+          ],
+        }),
       });
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(`Request Timed out or failed`);
+        throw new Error(`API error: ${res.status} - ${errorText}`);
       }
 
-      const assistantMessageId = uuidv4();
-      let assistantContent = '';
+      const data = await res.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
-      // Create assistant message placeholder
+      const assistantMessage: Message = {
+        id: uuidv4(),
+        content: data.content,
+        role: 'assistant',
+      };
+
       setChats((prev) =>
         prev.map((chat) =>
-          chat.id === currentChatId
-            ? {
-              ...chat,
-              messages: [...chat.messages, { id: assistantMessageId, content: '', role: 'assistant' }],
-            }
+          chat.id === chatId
+            ? { ...chat, messages: [...chat.messages, assistantMessage] }
             : chat
         )
       );
 
-      // Process streaming response
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error('No response body');
-
-      const decoder = new TextDecoder();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter((line) => line.trim());
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') continue;
-
-            try {
-              const parsed = JSON.parse(data);
-              const content = parsed.choices[0]?.delta?.content;
-              if (content) {
-                assistantContent += content;
-                setChats((prev) =>
-                  prev.map((chat) =>
-                    chat.id === currentChatId
-                      ? {
-                        ...chat,
-                        messages: chat.messages.map((msg) =>
-                          msg.id === assistantMessageId
-                            ? { ...msg, content: assistantContent }
-                            : msg
-                        ),
-                      }
-                      : chat
-                  )
-                );
-              }
-            } catch (jsonError) {
-              console.warn('Invalid JSON chunk:', data); // Log invalid chunks but don't throw
-            }
-          }
-        }
-      }
-
-      // Update chat title if first message
-      if ((currentChat?.messages.length || 0) === 0) {
+      // ✅ Update title if first message
+      if ((chats.find((c) => c.id === chatId)?.messages.length || 0) === 0) {
         setChats((prev) =>
           prev.map((chat) =>
-            chat.id === currentChatId ? { ...chat, title: content.slice(0, 30) + '...' } : chat
+            chat.id === chatId
+              ? { ...chat, title: content.slice(0, 30) + '...' }
+              : chat
           )
         );
       }
@@ -138,7 +140,7 @@ export default function Home() {
       };
       setChats((prev) =>
         prev.map((chat) =>
-          chat.id === currentChatId
+          chat.id === chatId
             ? { ...chat, messages: [...chat.messages, errorMessage] }
             : chat
         )
@@ -155,16 +157,34 @@ export default function Home() {
         currentChatId={currentChatId}
         onNewChat={handleNewChat}
         onSelectChat={setCurrentChatId}
+        onDeleteChat={handleDeleteChat}
       />
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {currentChat ? (
-            currentChat.messages.map((msg: any) => <ChatMessage key={msg.id} message={msg} />)
-          ) : (
-            <div className="text-center mt-20">Select or start a new chat</div>
-          )}
+      <div className="flex-1 flex flex-col w-[calc(100vw-210px)] max-w-[calc(100vw-210px)] content-area">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 chat-container">
+          <div
+            ref={chatContainerRef}
+            className="flex-1 overflow-y-auto px-4 py-2"
+          >
+            {currentChat?.messages.map((msg, i) => (
+              <ChatMessage
+                key={msg.id}
+                message={msg}
+                animateText={i === currentChat.messages.length - 1 && msg.role === "assistant"}
+              />
+            ))}
+
+            {/* Typing dots bubble */}
+            {isLoading && currentChatId && (
+              <ChatMessage
+                isTyping
+                message={{ id: "typing", role: "assistant", content: "" }}
+              />
+            )}
+          </div>
+          <div ref={messagesEndRef} />
         </div>
-        <ChatInput onSend={handleSendMessage} disabled={!currentChatId || isLoading} />
+        {/* ✅ Input only disabled when loading */}
+        <ChatInput onSend={handleSendMessage} disabled={isLoading} />
       </div>
     </div>
   );
