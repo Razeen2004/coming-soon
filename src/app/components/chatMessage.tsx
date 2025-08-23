@@ -66,7 +66,7 @@ export default function ChatMessage({ message, isTyping, animateText }: ChatMess
               }: {
                 inline?: boolean
                 className?: string
-                children: ReactNode
+                children?: ReactNode
               }) {
                 const match = /language-(\w+)/.exec(className || "")
                 return !inline && match ? (
