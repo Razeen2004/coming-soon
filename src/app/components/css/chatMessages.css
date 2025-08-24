@@ -1,5 +1,8 @@
 .screenbox {
   position: relative;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
 }
 
 .screenbox:before {
@@ -13,9 +16,59 @@
   opacity: 0.08;
 }
 
-.screenbox > div{
+.screenbox .chat-area {
+  z-index: 1;
+}
+
+.screenbox .navarea {
   z-index: 2;
 }
+
+
+.chat-area {
+  overflow-y: scroll;
+  width: 100%;
+  position: relative;
+}
+
+.chat-area .container {
+  margin: 0 auto;
+  height: 100vh;
+  width: 760px;
+}
+
+.navbar {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.chat-area .container .input-area {
+  position: fixed;
+  bottom: 0px;
+  width: 760px;
+}
+
+.chat-area .container .input-area:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(10px);
+  z-index: -1;
+  background: #1B1B1D;
+}
+
+
+.chat-area .container .messages-text-area {
+
+  padding-bottom: 140px;
+}
+
 
 /* Base container */
 .assistant-message {
@@ -192,22 +245,22 @@
 }
 
 
-.content-area div::-webkit-scrollbar {
+.chat-area::-webkit-scrollbar {
   height: 130px;
   /* horizontal scrollbar height */
   width: 10px;
   /* vertical scrollbar width */
 }
 
-.content-area div::-webkit-scrollbar-track {
+.chat-area::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.content-area div::-webkit-scrollbar-thumb {
+.chat-area::-webkit-scrollbar-thumb {
   background: #26262C;
 }
 
-.content-area div::-webkit-scrollbar-thumb:hover {
+.chat-area::-webkit-scrollbar-thumb:hover {
   background: #666;
   /* hover effect */
 }
@@ -272,10 +325,48 @@
   filter: brightness(0) invert(1);
 }
 
-.submit-button{
+.submit-button {
   cursor: pointer;
   background: #2D2D33;
   aspect-ratio: 1/1;
   border-radius: 200rem;
   padding: 10px;
+}
+
+@media screen and (max-width: 1000px) {
+
+  .chat-area .container .input-area {
+    position: fixed;
+    bottom: 0px;
+    width: -webkit-fill-available;
+  }
+
+  .chat-area .container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .chat-area .container .messages-text-area {
+    padding: 0 20px;
+  }
+
+
+  .chat-area .container .input-area {
+    padding: 0 20px;
+  }
+
+  .screenbox .navarea {
+    margin-top: 40px;
+  }
+
+  .screenbox:before {
+    content: "";
+    position: absolute;
+    background: none;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    z-index: 1;
+    opacity: 0.08;
+  }
 }

@@ -6,15 +6,19 @@ import ChatSidebar from './components/chatSidebar';
 import ChatInput from './components/chatInput';
 import ChatMessage from './components/chatMessage';
 import { Chat, Message } from './types/index';
+import { FiMenu } from 'react-icons/fi';
 
 export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const currentChat = chats.find((chat) => chat.id === currentChatId);
 
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Auto-scroll when messages change
   useEffect(() => {
@@ -44,18 +48,13 @@ export default function Home() {
 
   const handleDeleteChat = (id: string) => {
     setChats((prev) => prev.filter((chat) => chat.id !== id));
-
     if (currentChatId === id) {
-      setCurrentChatId(null); // clear if current chat is deleted
+      setCurrentChatId(null);
     }
   };
 
   const handleNewChat = () => {
-    const newChat: Chat = {
-      id: uuidv4(),
-      title: 'New Chat',
-      messages: [],
-    };
+    const newChat: Chat = { id: uuidv4(), title: 'New Chat', messages: [] };
     setChats([newChat, ...chats]);
     setCurrentChatId(newChat.id);
   };
@@ -63,13 +62,8 @@ export default function Home() {
   const handleSendMessage = async (content: string) => {
     let chatId = currentChatId;
 
-    // ✅ Auto-create chat if none exists
     if (!chatId) {
-      const newChat: Chat = {
-        id: uuidv4(),
-        title: 'New Chat',
-        messages: [],
-      };
+      const newChat: Chat = { id: uuidv4(), title: 'New Chat', messages: [] };
       setChats((prev) => [newChat, ...prev]);
       setCurrentChatId(newChat.id);
       chatId = newChat.id;
@@ -103,9 +97,7 @@ export default function Home() {
       }
 
       const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      if (data.error) throw new Error(data.error);
 
       const assistantMessage: Message = {
         id: uuidv4(),
@@ -121,7 +113,6 @@ export default function Home() {
         )
       );
 
-      // ✅ Update title if first message
       if ((chats.find((c) => c.id === chatId)?.messages.length || 0) === 0) {
         setChats((prev) =>
           prev.map((chat) =>
@@ -152,39 +143,68 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-[#1A1A1D] screenbox">
-      <ChatSidebar
-        chats={chats}
-        currentChatId={currentChatId}
-        onNewChat={handleNewChat}
-        onSelectChat={setCurrentChatId}
-        onDeleteChat={handleDeleteChat}
-      />
-      <div className="flex-1 flex flex-col w-[calc(100vw-210px)] max-w-[calc(100vw-210px)] content-area">
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 chat-container">
-          <div
-            ref={chatContainerRef}
-            className="flex-1 overflow-y-auto px-4 py-2"
-          >
-            {currentChat?.messages.map((msg, i) => (
-              <ChatMessage
-                key={msg.id}
-                message={msg}
-                animateText={i === currentChat.messages.length - 1 && msg.role === "assistant"}
-              />
-            ))}
+      {/* Sidebar */}
+      <div
+        className={`fixed p-2 md:static top-0 left-0 h-full w-[220px] bg-[#111] z-40 transform transition-transform duration-300 navarea 
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
+      >
+        <ChatSidebar
+          chats={chats}
+          currentChatId={currentChatId}
+          onNewChat={handleNewChat}
+          onSelectChat={(id) => {
+            setCurrentChatId(id);
+            setIsSidebarOpen(false);
+          }}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          onDeleteChat={handleDeleteChat}
+        />
+      </div>
 
-            {/* Typing dots bubble */}
-            {isLoading && currentChatId && (
-              <ChatMessage
-                isTyping
-                message={{ id: "typing", role: "assistant", content: "" }}
-              />
-            )}
+      {/* Main Area */}
+      <div className="flex-1 flex flex-col w-full md:w-[calc(100vw-220px)] chat-area">
+        {/* Mobile Header */}
+        <div className='container'>
+          <div className="md:hidden flex items-center justify-between p-3 bg-[#131315] text-white navbar">
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+              <FiMenu size={22} />
+            </button>
+            <span className="text-sm font-semibold">
+              {currentChat?.title || 'New Chat'}
+            </span>
+            <div className="w-[22px]" /> {/* spacer */}
           </div>
-          <div ref={messagesEndRef} />
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto space-y-4 chat-container messages-text-area">
+            <div
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto px-2 md:px-4 py-2"
+            >
+              {currentChat?.messages.map((msg, i) => (
+                <ChatMessage
+                  key={msg.id}
+                  message={msg}
+                  animateText={
+                    i === currentChat.messages.length - 1 &&
+                    msg.role === 'assistant'
+                  }
+                />
+              ))}
+              {isLoading && currentChatId && (
+                <ChatMessage
+                  isTyping
+                  message={{ id: 'typing', role: 'assistant', content: '' }}
+                />
+              )}
+            </div>
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input */}
+          <ChatInput onSend={handleSendMessage} disabled={isLoading} />
         </div>
-        {/* ✅ Input only disabled when loading */}
-        <ChatInput onSend={handleSendMessage} disabled={isLoading} />
       </div>
     </div>
   );
