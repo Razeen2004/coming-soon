@@ -347,12 +347,16 @@
   }
 
   .chat-area .container .messages-text-area {
-    padding: 0 20px;
+    padding: 0 10px;
   }
 
 
   .chat-area .container .input-area {
-    padding: 0 20px;
+    padding: 0 10px;
+  }
+  
+  .chat-area .container .input-area > p{
+    font-size: 12px;
   }
 
   .screenbox .navarea {
@@ -368,5 +372,8 @@
     background-size: cover;
     z-index: 1;
     opacity: 0.08;
+  }
+  .chat-area .container .messages-text-area{
+    padding-bottom: 140px !important;
   }
 }
