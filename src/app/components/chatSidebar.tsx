@@ -3,6 +3,10 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { Chat } from "../types/index";
 import { MdOutlineOpenInNew } from "react-icons/md";
 
+
+import smallLogo from "@/../public/logo-mini.png"
+import Image from "next/image";
+
 interface ChatSidebarProps {
   chats: Chat[];
   currentChatId: string | null;
@@ -35,14 +39,16 @@ export default function ChatSidebar({
       <div
         className={`${isOpen ? "translate-x-0" : "translate-x"}`}
       >
+        <Image src={smallLogo} alt="Logo" width={28} height={28} className="mb-[40px] ml-[5px] mt-[5px]" />
         <button
           onClick={onNewChat}
-          className="flex items-center gap-2 justify-center text-[14px] bg-[#2D2D33] p-2 rounded mb-4 w-full"
+          className="flex items-center gap-[8px] text-[14px] p-2 mb-4 w-full bg-none hover:bg-[#2D2D33]"
         >
-          <MdOutlineOpenInNew className="text-[#F2F2F2] text-[15px]" /> New Chat
+          <MdOutlineOpenInNew className="text-[#F2F2F2] text-[15px]" /> New chat
         </button>
-
-        <div className="flex-1 overflow-y-auto space-y-2">
+        <hr className="border-[#262628] border-[1.5px] mb-[14px]" />
+        <span className="ml-2 text-[13px] text-[#999999] ">Chats</span>
+        <div className="flex-1 overflow-y-auto space-y-2 mt-[12px]">
           {chats.map((chat) => (
             <div
               key={chat.id}

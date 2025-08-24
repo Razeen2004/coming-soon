@@ -7,6 +7,8 @@ import ChatInput from './components/chatInput';
 import ChatMessage from './components/chatMessage';
 import { Chat, Message } from './types/index';
 import { FiMenu } from 'react-icons/fi';
+import largeLogo from "@/../public/logo.png"
+import Image from 'next/image';
 
 export default function Home() {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -192,6 +194,14 @@ export default function Home() {
                   }
                 />
               ))}
+
+              {(!currentChat || currentChat.messages.length === 0) && (
+                <div className="text-center text-[14px] text-[#F2F2F2] mt-[100px] px-4">
+                  <Image src={largeLogo} alt="Logo" width={200} height={80} className="mb-4 mx-auto" />
+                  <h2 className="mb-2 text-[20px]">Welcome to Prompt Suite!</h2>
+                  <p className='opacity-[0.8]'>Ask me anything, and I'll do my best to assist you.</p>
+                </div>
+              )}
               {isLoading && currentChatId && (
                 <ChatMessage
                   isTyping

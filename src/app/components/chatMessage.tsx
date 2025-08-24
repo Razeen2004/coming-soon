@@ -18,8 +18,6 @@ import rehypeKatex from "rehype-katex"
 import "katex/dist/katex.min.css"
 
 // Icons
-import { FiCopy } from "react-icons/fi"
-import { AiOutlineUser, AiOutlineRobot } from "react-icons/ai"
 import Image from "next/image"
 
 interface ChatMessageProps {
@@ -69,7 +67,7 @@ export default function ChatMessage({
     <div className="flex flex-col my-2  w-[100%]">
       <div
         className={`relative overflow-hidden w-[100%] rounded-lg text-[16px] my-[10px] text-[#F2F2F2] ${isUser
-          ? "bg-[#26262C] ml-auto p-4 max-w-[70%] text-left"
+          ? "bg-[#26262C] ml-auto p-4 max-w-[70%] w-[auto] text-left"
           : "mr-auto text-left assistant-message w-full"
           }`}
       >
