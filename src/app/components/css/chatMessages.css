@@ -1,3 +1,22 @@
+.screenbox {
+  position: relative;
+}
+
+.screenbox:before {
+  content: "";
+  position: absolute;
+  background: url("../../../../public/bg-window.jpg");
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  z-index: 1;
+  opacity: 0.08;
+}
+
+.screenbox > div{
+  z-index: 2;
+}
+
 /* Base container */
 .assistant-message {
   line-height: 1.6;
@@ -63,6 +82,7 @@
   text-decoration: none;
   transition: color 0.2s;
 }
+
 .assistant-message a:hover {
   color: #a56eee;
   text-decoration: underline;
@@ -98,10 +118,14 @@
   font-family: "Fira Code", monospace;
 
   /* Fix overflow */
-  white-space: pre-wrap;   /* wrap long lines */
-  word-wrap: break-word;   /* break words if needed */
-  overflow-x: auto;        /* allow horizontal scroll if absolutely needed */
-  max-width: 100%;         /* never exceed parent width */
+  white-space: pre-wrap;
+  /* wrap long lines */
+  word-wrap: break-word;
+  /* break words if needed */
+  overflow-x: auto;
+  /* allow horizontal scroll if absolutely needed */
+  max-width: 100%;
+  /* never exceed parent width */
   box-sizing: border-box;
 }
 
@@ -139,43 +163,44 @@
   font-weight: 600;
 }
 
-
-
-/* For WebKit browsers (Chrome, Edge, Safari) */
 .assistant-message pre::-webkit-scrollbar {
-  height: 8px;              /* horizontal scrollbar height */
-  width: 8px;               /* vertical scrollbar width */
+  height: 130px;
+  /* horizontal scrollbar height */
+  width: 10px;
+  /* vertical scrollbar width */
 }
 
 .assistant-message pre::-webkit-scrollbar-track {
-  background: #1e1e2f;       /* scrollbar track */
-  border-radius: 10px;
+  background: transparent;
 }
 
 .assistant-message pre::-webkit-scrollbar-thumb {
-  background: #444;          /* draggable part */
-  border-radius: 10px;
-  border: 2px solid #1e1e2f; /* gap around thumb */
+  background: #26262C;
 }
 
 .assistant-message pre::-webkit-scrollbar-thumb:hover {
-  background: #666;          /* hover effect */
+  background: #666;
+  /* hover effect */
 }
 
 /* For Firefox */
 .assistant-message pre {
-  scrollbar-width: thin;          /* "auto" or "thin" */
-  scrollbar-color: #444 #1e1e2f;  /* thumb color, track color */
+  scrollbar-width: thin;
+  /* "auto" or "thin" */
+  scrollbar-color: #444 #1e1e2f;
+  /* thumb color, track color */
 }
 
 
 .content-area div::-webkit-scrollbar {
-  height: 130px;              /* horizontal scrollbar height */
-  width: 10px;               /* vertical scrollbar width */
+  height: 130px;
+  /* horizontal scrollbar height */
+  width: 10px;
+  /* vertical scrollbar width */
 }
 
 .content-area div::-webkit-scrollbar-track {
-  background: transparent;  
+  background: transparent;
 }
 
 .content-area div::-webkit-scrollbar-thumb {
@@ -183,36 +208,74 @@
 }
 
 .content-area div::-webkit-scrollbar-thumb:hover {
-  background: #666;          /* hover effect */
+  background: #666;
+  /* hover effect */
 }
 
 /* Typing dots animation (inside the assistant bubble) */
 .typing-indicator {
   display: inline-flex;
-  gap: 6px;
-  align-items: center;
+  gap: 2px;
+  align-items: flex-end;
 }
 
 .typing-indicator span {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
   background: #bbb;
   border-radius: 50%;
   display: inline-block;
   animation: typingBounce 1.4s infinite ease-in-out;
+  margin-bottom: 4px;
 }
 
-.typing-indicator span:nth-child(1) { animation-delay: 0s; }
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
 
 @keyframes typingBounce {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-  40% { transform: scale(1); opacity: 1; }
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.chat-title{
-      white-space: nowrap;
-    width: 54%;
-    overflow: hidden;
+.chat-title {
+  white-space: nowrap;
+  width: 54%;
+  overflow: hidden;
+}
+
+
+.assistant-icons button,
+.assistant-icons button img {
+  cursor: pointer;
+}
+
+.assistant-icons button:hover img {
+  filter: brightness(0) invert(1);
+}
+
+.submit-button{
+  cursor: pointer;
+  background: #2D2D33;
+  aspect-ratio: 1/1;
+  border-radius: 200rem;
+  padding: 10px;
 }

@@ -7,13 +7,32 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
 import "./css/chatMessages.css"
 
+import like from "@/../public/like.svg"
+import dislike from "@/../public/dislike.svg"
+import copy from "@/../public/copy.svg"
+import reload from "@/../public/reload.svg"
+import smallLogo from "@/../public/logo-mini.png"
+// Math support
+import remarkMath from "remark-math"
+import rehypeKatex from "rehype-katex"
+import "katex/dist/katex.min.css"
+
+// Icons
+import { FiCopy } from "react-icons/fi"
+import { AiOutlineUser, AiOutlineRobot } from "react-icons/ai"
+import Image from "next/image"
+
 interface ChatMessageProps {
   message: Message
   isTyping?: boolean // typing dots
   animateText?: boolean // animate assistant’s text
 }
 
-export default function ChatMessage({ message, isTyping, animateText }: ChatMessageProps) {
+export default function ChatMessage({
+  message,
+  isTyping,
+  animateText,
+}: ChatMessageProps) {
   const isUser = message.role === "user"
   const [displayedText, setDisplayedText] = useState(
     animateText ? "" : message.content
@@ -35,28 +54,50 @@ export default function ChatMessage({ message, isTyping, animateText }: ChatMess
         if (chatBox) {
           chatBox.scrollTop = chatBox.scrollHeight
         }
-      }, 6)
+      }, 3)
 
       return () => clearInterval(interval)
     }
   }, [animateText, message.content, isUser])
 
+  // Copy to clipboard
+  const handleCopy = () => {
+    navigator.clipboard.writeText(message.content)
+  }
 
   return (
-    <div className="flex justify-center items-center my-2 px-[20%]">
+    <div className="flex flex-col my-2 px-[20%]">
       <div
-        className={`overflow-hidden rounded-lg text-[16px] my-[10px] text-[#F2F2F2] ${isUser
-            ? "bg-[#26262C] ml-auto p-4 max-w-[70%] text-left"
-            : "mr-auto bg-transparent text-left assistant-message p-4"
+        className={`relative overflow-hidden rounded-lg text-[16px] my-[10px] text-[#F2F2F2] ${isUser
+          ? "bg-[#26262C] ml-auto p-4 max-w-[70%] text-left"
+          : "mr-auto text-left assistant-message w-full"
           }`}
       >
+
+        {/* Typing or Message */}
         {isTyping && !isUser ? (
-          <div className="typing-indicator" aria-live="polite" aria-label="Assistant is typing">
-            <span></span><span></span><span></span>
+          <div
+            className="typing-indicator flex items-end justify-start space-x-1 relative"
+            aria-live="polite"
+            aria-label="Assistant is typing"
+          >
+            <div>
+              <Image
+                src={smallLogo}
+                alt="Prompt Suite"
+                width={30}
+                height={30}
+              />
+            </div>
+
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
         ) : (
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
             components={{
               code({
                 inline,
@@ -90,6 +131,30 @@ export default function ChatMessage({ message, isTyping, animateText }: ChatMess
           </ReactMarkdown>
         )}
       </div>
+      {!isTyping && !isUser ? (
+        <div className="flex gap-3 items-center assistant-icons">
+          <button className="hover:text-white transition-colors" title="Like">
+            <Image src={like} alt="Like" width={20} height={20} />
+          </button>
+          <button
+            className="hover:text-white transition-colors"
+            title="Dislike">
+            <Image src={dislike} alt="Dislike" width={20} height={20} />
+          </button>
+          <button
+            onClick={handleCopy}
+            className="hover:text-white transition-colors"
+            title="Copy response"
+          >
+            <Image src={copy} alt="Copy" width={20} height={20} />
+          </button>
+          <button>
+            <Image src={reload} alt="Reload" width={20} height={20} />
+          </button>
+        </div>
+      ) : (
+        <div></div>
+      )}
     </div>
   )
 }

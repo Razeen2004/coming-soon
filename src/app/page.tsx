@@ -151,7 +151,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-[#1B1B1D]">
+    <div className="flex h-screen bg-[#1A1A1D] screenbox">
       <ChatSidebar
         chats={chats}
         currentChatId={currentChatId}
