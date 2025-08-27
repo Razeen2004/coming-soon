@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
+
 import type { ReactNode } from "react"
 import { Message } from "../types/index"
 import ReactMarkdown from "react-markdown"
@@ -6,6 +7,7 @@ import remarkGfm from "remark-gfm"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism"
 import "./css/chatMessages.css"
+import toast from 'react-hot-toast'
 
 import like from "@/../public/like.svg"
 import dislike from "@/../public/dislike.svg"
@@ -24,12 +26,13 @@ interface ChatMessageProps {
   message: Message
   isTyping?: boolean // typing dots
   animateText?: boolean // animate assistant’s text
+  onRegenerate?: () => void // callback for regenerate action
 }
-
 export default function ChatMessage({
   message,
   isTyping,
   animateText,
+  onRegenerate,
 }: ChatMessageProps) {
   const isUser = message.role === "user"
   const [displayedText, setDisplayedText] = useState(
@@ -58,17 +61,39 @@ export default function ChatMessage({
     }
   }, [animateText, message.content, isUser])
 
-  // Copy to clipboard
-  const handleCopy = () => {
-    navigator.clipboard.writeText(message.content)
+  // Message actions
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content)
+      toast.success('Message copied to clipboard')
+    } catch (error) {
+      toast.error('Failed to copy message')
+    }
+  }
+
+  const handleLike = () => {
+    toast.success('Message liked')
+    // Add your like logic here
+  }
+
+  const handleDislike = () => {
+    toast.success('Message disliked')
+    // Add your dislike logic here
+  }
+
+  const handleRegenerate = () => {
+    if (onRegenerate) {
+      onRegenerate()
+      toast.success('Regenerating response...')
+    }
   }
 
   return (
-    <div className="flex flex-col my-2  w-[100%]">
+    <div className="flex flex-col my-2 w-[100%]">
       <div
         className={`relative overflow-hidden w-[100%] rounded-lg text-[16px] my-[10px] text-[#F2F2F2] ${isUser
-          ? "bg-[#26262C] ml-auto p-4 max-w-[70%] w-[auto] text-left"
-          : "mr-auto text-left assistant-message w-full"
+            ? "bg-[#26262C] ml-auto p-4 max-w-[70%] w-[auto] text-left"
+            : "mr-auto text-left assistant-message w-full"
           }`}
       >
 
@@ -131,23 +156,33 @@ export default function ChatMessage({
       </div>
       {!isTyping && !isUser ? (
         <div className="flex gap-3 items-center assistant-icons">
-          <button className="hover:text-white transition-colors" title="Like">
+          <button
+            onClick={handleLike}
+            className="hover:bg-gray-700 rounded transition-colors"
+            aria-label="Like message"
+          >
             <Image src={like} alt="Like" width={20} height={20} />
           </button>
           <button
-            className="hover:text-white transition-colors"
-            title="Dislike">
+            onClick={handleDislike}
+            className="hover:bg-gray-700 rounded transition-colors"
+            aria-label="Dislike message"
+          >
             <Image src={dislike} alt="Dislike" width={20} height={20} />
           </button>
           <button
             onClick={handleCopy}
-            className="hover:text-white transition-colors"
-            title="Copy response"
+            className="hover:bg-gray-700 rounded transition-colors"
+            aria-label="Copy message"
           >
             <Image src={copy} alt="Copy" width={20} height={20} />
           </button>
-          <button>
-            <Image src={reload} alt="Reload" width={20} height={20} />
+          <button
+            onClick={handleRegenerate}
+            className="hover:bg-gray-700 rounded transition-colors"
+            aria-label="Regenerate response"
+          >
+            <Image src={reload} alt="Regenerate" width={20} height={20} />
           </button>
         </div>
       ) : (

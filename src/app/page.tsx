@@ -61,7 +61,28 @@ export default function Home() {
     setCurrentChatId(newChat.id);
   };
 
-  const handleSendMessage = async (content: string) => {
+  const handleRegenerate = async (chatId: string) => {
+    const chat = chats.find((c) => c.id === chatId);
+    if (!chat || chat.messages.length < 2) return;
+
+    // Get the last user message
+    const lastUserMessage = [...chat.messages].reverse().find(m => m.role === 'user');
+    if (!lastUserMessage) return;
+
+    // Remove the last assistant message
+    setChats(prev => 
+      prev.map(c => 
+        c.id === chatId 
+          ? { ...c, messages: c.messages.slice(0, -1) }
+          : c
+      )
+    );
+
+    // Regenerate the response
+    await handleSendMessage(lastUserMessage.content, chatId);
+  };
+
+  const handleSendMessage = async (content: string, existingChatId?: string) => {
     let chatId = currentChatId;
 
     if (!chatId) {
@@ -82,13 +103,17 @@ export default function Home() {
 
     setIsLoading(true);
     try {
+      // Get the current chat
+      const currentChat = chats.find((c) => c.id === chatId);
+      
+      // Send the entire conversation history
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            ...(chats.find((c) => c.id === chatId)?.messages || []),
-            userMessage,
+            ...(currentChat?.messages || []),  // Include all previous messages
+            userMessage,  // Add the new message
           ],
         }),
       });

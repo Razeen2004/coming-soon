@@ -3,9 +3,9 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { Chat } from "../types/index";
 import { MdOutlineOpenInNew } from "react-icons/md";
 
-
 import smallLogo from "@/../public/logo-mini.png"
 import Image from "next/image";
+import upgradeBanner from "@/../public/upgrade-banner.png"
 
 interface ChatSidebarProps {
   chats: Chat[];
@@ -31,13 +31,13 @@ export default function ChatSidebar({
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden h-full"
           onClick={onClose}
         />
       )}
 
       <div
-        className={`${isOpen ? "translate-x-0" : "translate-x"}`}
+        className={`h-full flex flex-col ${isOpen ? "translate-x-0" : "translate-x"}`}
       >
         <Image src={smallLogo} alt="Logo" width={28} height={28} className="mb-[40px] ml-[5px] mt-[5px]" />
         <button
@@ -48,18 +48,17 @@ export default function ChatSidebar({
         </button>
         <hr className="border-[#262628] border-[1.5px] mb-[14px]" />
         <span className="ml-2 text-[13px] text-[#999999] ">Chats</span>
-        <div className="flex-1 overflow-y-auto space-y-2 mt-[12px]">
+        <div className="flex-1 overflow-y-auto space-y-2 mt-[12px] h-[200px] chats-list-div mb-3">
           {chats.map((chat) => (
             <div
               key={chat.id}
-              className={`flex items-center justify-between p-2 rounded cursor-pointer text-[14px] ${
-                chat.id === currentChatId
-                  ? "bg-[#2D2D33]"
-                  : "hover:bg-gray-700"
-              }`}
+              className={`flex items-center justify-between p-2 rounded cursor-pointer text-[14px] ${chat.id === currentChatId
+                ? "bg-[#2D2D33]"
+                : "hover:bg-gray-700"
+                }`}
             >
               <div
-                className="flex-1 break-words pr-2 chat-title"
+                className="flex-1 break-words pr-2 chat-title text-[#999999]"
                 onClick={() => onSelectChat(chat.id)}
               >
                 {chat.title}
@@ -75,6 +74,9 @@ export default function ChatSidebar({
               </button>
             </div>
           ))}
+        </div>
+        <div className="h-[auto] mt-[auto]">
+          <Image src={upgradeBanner} alt="Prompt Suite" width={200} height={200} className="rounded-[6px] w-[100%] aspect-square" />
         </div>
       </div>
     </>

@@ -7,27 +7,29 @@ export async function POST(req: Request) {
     const body = await req.json();
     const messages = body.messages;
 
-    // Get the last user message
-    const userMessage = messages[messages.length - 1].content;
-
-    // The recommended way to handle a "system prompt" with Gemma is to prepend it to the user's message.
-    const fullUserMessage = `${systemPrompt}\n\n${userMessage}`;
+    // Convert previous messages to Gemini's format
+    const contents = [
+      // First message is the system prompt
+      {
+        role: "user",
+        parts: [{ text: systemPrompt }]
+      },
+      // Then add all conversation messages in sequence
+      ...messages.map((msg: Message) => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      }))
+    ];
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${process.env.GOOGLE_API_KEY}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contents: [
-            {
-              // The role must be 'user'
-              role: "user",
-              parts: [{ text: fullUserMessage }],
-            },
-          ],
+          contents,
         }),
       }
     );

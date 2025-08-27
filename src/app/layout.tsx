@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Urbanist } from "next/font/google";
+import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 
 const urbanist = Urbanist({
@@ -25,6 +26,16 @@ export default function RootLayout({
       <body
         className={`${urbanist.variable} antialiased]`}
       >
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 2000,
+            style: {
+              background: '#26262C',
+              color: '#F2F2F2',
+            },
+          }}
+        />
         {children}
       </body>
     </html>

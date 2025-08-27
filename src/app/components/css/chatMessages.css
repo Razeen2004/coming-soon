@@ -248,22 +248,22 @@ body {
   /* thumb color, track color */
 }
 
-
+.chats-list-div::-webkit-scrollbar,
 .chat-area::-webkit-scrollbar {
   height: 130px;
   /* horizontal scrollbar height */
   width: 10px;
   /* vertical scrollbar width */
 }
-
+.chats-list-div::-webkit-scrollbar-track,
 .chat-area::-webkit-scrollbar-track {
   background: transparent;
 }
-
+.chats-list-div::-webkit-scrollbar-thumb,
 .chat-area::-webkit-scrollbar-thumb {
   background: #26262C;
 }
-
+.chats-list-div::-webkit-scrollbar-thumb:hover,
 .chat-area::-webkit-scrollbar-thumb:hover {
   background: #666;
   /* hover effect */
@@ -363,10 +363,6 @@ body {
     font-size: 12px;
   }
 
-  .screenbox .navarea {
-    margin-top: 40px;
-  }
-
   .screenbox:before {
     content: "";
     position: absolute;
@@ -381,4 +377,13 @@ body {
   .chat-area .container .messages-text-area {
     padding-bottom: 140px !important;
   }
+}
+
+@media screen and (max-width: 768px) {
+  
+  .screenbox .navarea {
+    margin-top: 40px;
+    height: calc(100% - 40px);
+  }
+  
 }
